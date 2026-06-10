@@ -27,6 +27,15 @@
       --aprobado:      #58a6ff;
       --aprobado-bg:   #0f1f3d;
 
+      --critica:       #f85149;
+      --critica-bg:    #2a0f0f;
+      --alta:          #f0883e;
+      --alta-bg:       #2a1800;
+      --media:         #e3b341;
+      --media-bg:      #2a2000;
+      --baja:          #56d364;
+      --baja-bg:       #0f2a16;
+
       --sidebar-w: 220px;
     }
 
@@ -642,6 +651,111 @@
       line-height: 1.4;
     }
 
+    /* ── Priority panel ── */
+    .priority-panel {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .priority-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .priority-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .priority-card.critica::before { background: var(--critica); }
+    .priority-card.alta::before    { background: var(--alta); }
+    .priority-card.media::before   { background: var(--media); }
+    .priority-card.baja::before    { background: var(--baja); }
+
+    .priority-card:hover { border-color: var(--border2); }
+    .priority-card.active-filter { border-color: currentColor; }
+    .priority-card.critica.active-filter { border-color: var(--critica); background: var(--critica-bg); }
+    .priority-card.alta.active-filter    { border-color: var(--alta);    background: var(--alta-bg); }
+    .priority-card.media.active-filter   { border-color: var(--media);   background: var(--media-bg); }
+    .priority-card.baja.active-filter    { border-color: var(--baja);    background: var(--baja-bg); }
+
+    .pcard-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .pcard-label.critica { color: var(--critica); }
+    .pcard-label.alta    { color: var(--alta); }
+    .pcard-label.media   { color: var(--media); }
+    .pcard-label.baja    { color: var(--baja); }
+
+    .pcard-count {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .pcard-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ── Priority badge ── */
+    .priority-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .priority-badge.critica { color: var(--critica); background: var(--critica-bg); border: 1px solid var(--critica); }
+    .priority-badge.alta    { color: var(--alta);    background: var(--alta-bg);    border: 1px solid var(--alta); }
+    .priority-badge.media   { color: var(--media);   background: var(--media-bg);   border: 1px solid var(--media); }
+    .priority-badge.baja    { color: var(--baja);    background: var(--baja-bg);    border: 1px solid var(--baja); }
+
+    /* ── Priority select ── */
+    select.priority-select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 32px 8px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color .15s;
+    }
+
+    select.priority-select:focus { border-color: var(--accent); }
+    select.priority-select.critica { color: var(--critica); }
+    select.priority-select.alta    { color: var(--alta); }
+    select.priority-select.media   { color: var(--media); }
+    select.priority-select.baja    { color: var(--baja); }
+
     /* scrollbar */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -719,14 +833,25 @@
       <label>Título</label>
       <input type="text" class="modal-input" id="newTitle" placeholder="Describe la tarea…" maxlength="120">
     </div>
-    <div class="field">
-      <label>Estado inicial</label>
-      <select class="modal-select" id="newStatus">
-        <option value="abierto">Abierto</option>
-        <option value="proceso">En proceso</option>
-        <option value="rechazado">Rechazado</option>
-        <option value="aprobado">Aprobado</option>
-      </select>
+    <div style="display:flex;gap:12px">
+      <div class="field" style="flex:1">
+        <label>Estado inicial</label>
+        <select class="modal-select" id="newStatus">
+          <option value="abierto">Abierto</option>
+          <option value="proceso">En proceso</option>
+          <option value="rechazado">Rechazado</option>
+          <option value="aprobado">Aprobado</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1">
+        <label>Prioridad</label>
+        <select class="modal-select" id="newPriority">
+          <option value="critica">Crítica</option>
+          <option value="alta">Alta</option>
+          <option value="media" selected>Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
     </div>
     <div class="field">
       <label>Notas (opcional)</label>
@@ -748,14 +873,17 @@
     aprobado:  { label: 'Aprobado' },
   };
 
-  let db = JSON.parse(localStorage.getItem('opja_db') || 'null') || {
-    projects: [],   // [{ id, name, key, nextIssue }]
-    issues: {},     // { projectId: [{ id, title, status, notes, created }] }
-    active: null,   // active project id
+  const PRIORITIES = {
+    critica: { label: 'Crítica' },
+    alta:    { label: 'Alta' },
+    media:   { label: 'Media' },
+    baja:    { label: 'Baja' },
   };
 
+  let db = { projects: [], issues: {}, active: null };
+
   function save() {
-    localStorage.setItem('opja_db', JSON.stringify(db));
+    fetch('/api/db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(db) });
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -796,6 +924,12 @@
 
   function statusOptions(current) {
     return Object.entries(STATUSES).map(([k, v]) =>
+      `<option value="${k}" ${k === current ? 'selected' : ''}>${v.label}</option>`
+    ).join('');
+  }
+
+  function priorityOptions(current) {
+    return Object.entries(PRIORITIES).map(([k, v]) =>
       `<option value="${k}" ${k === current ? 'selected' : ''}>${v.label}</option>`
     ).join('');
   }
@@ -862,6 +996,7 @@
     }
 
     main.innerHTML = `
+      <div class="priority-panel" id="priorityPanel"></div>
       <div class="toolbar">
         <div class="search-wrap">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -876,6 +1011,13 @@
           <option value="rechazado">Rechazado</option>
           <option value="aprobado">Aprobado</option>
         </select>
+        <select class="filter-select" id="filterPriority">
+          <option value="">Todas las prioridades</option>
+          <option value="critica">Crítica</option>
+          <option value="alta">Alta</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja</option>
+        </select>
         <button class="btn-new" id="btnNewIssue">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 5v14M5 12h14"/>
@@ -889,22 +1031,50 @@
     document.getElementById('btnNewIssue').addEventListener('click', openIssueModal);
     document.getElementById('searchInput').addEventListener('input', renderIssues);
     document.getElementById('filterStatus').addEventListener('change', renderIssues);
+    document.getElementById('filterPriority').addEventListener('change', renderIssues);
 
     renderIssues();
   }
 
+  function renderPriorityPanel(all) {
+    const panel = document.getElementById('priorityPanel');
+    if (!panel) return;
+    const activePf = document.getElementById('filterPriority')?.value || '';
+    const counts = { critica: 0, alta: 0, media: 0, baja: 0 };
+    all.forEach(i => { const p = i.priority || 'media'; if (counts[p] !== undefined) counts[p]++; });
+    panel.innerHTML = Object.entries(PRIORITIES).map(([k, v]) => `
+      <div class="priority-card ${k} ${activePf === k ? 'active-filter' : ''}"
+           onclick="togglePriorityFilter('${k}')">
+        <div class="pcard-label ${k}">${v.label}</div>
+        <div class="pcard-count">${counts[k]}</div>
+        <div class="pcard-hint">tarea${counts[k] !== 1 ? 's' : ''}</div>
+      </div>
+    `).join('');
+  }
+
+  function togglePriorityFilter(key) {
+    const sel = document.getElementById('filterPriority');
+    if (!sel) return;
+    sel.value = sel.value === key ? '' : key;
+    renderIssues();
+  }
+
   function renderIssues() {
-    const q      = (document.getElementById('searchInput')?.value || '').toLowerCase();
-    const filter = document.getElementById('filterStatus')?.value || '';
-    const proj   = activeProject();
-    const list   = document.getElementById('issueList');
+    const q       = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const filterS = document.getElementById('filterStatus')?.value || '';
+    const filterP = document.getElementById('filterPriority')?.value || '';
+    const proj    = activeProject();
+    const list    = document.getElementById('issueList');
     if (!proj || !list) return;
 
     const all      = activeIssues();
+    renderPriorityPanel(all);
+
     const filtered = all.filter(i => {
       const mq = !q || i.title.toLowerCase().includes(q) || (i.notes || '').toLowerCase().includes(q);
-      const mf = !filter || i.status === filter;
-      return mq && mf;
+      const ms = !filterS || i.status === filterS;
+      const mp = !filterP || (i.priority || 'media') === filterP;
+      return mq && ms && mp;
     });
 
     if (filtered.length === 0) {
@@ -917,7 +1087,9 @@
       return;
     }
 
-    list.innerHTML = filtered.map(issue => `
+    list.innerHTML = filtered.map(issue => {
+      const prio = issue.priority || 'media';
+      return `
       <div class="issue" id="iss-${issue.id}" data-id="${issue.id}">
         <div class="issue-header" onclick="toggleIssue('${issue.id}')">
           <span class="issue-id">${escHtml(proj.key)}-${String(issue.num).padStart(3, '0')}</span>
@@ -925,6 +1097,7 @@
             <div class="issue-title">${escHtml(issue.title)}</div>
             <div class="issue-meta">Creado ${formatDate(issue.created)}</div>
           </div>
+          <span class="priority-badge ${prio}">${PRIORITIES[prio].label}</span>
           <span class="status-badge ${issue.status}">${STATUSES[issue.status].label}</span>
           <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6"/>
@@ -942,10 +1115,16 @@
               <input type="text" class="title-input" value="${escHtml(issue.title)}"
                 onchange="updateIssueField('${issue.id}','title',this.value)">
             </div>
-            <div class="field" style="flex:0 0 170px">
+            <div class="field" style="flex:0 0 150px">
               <label>Estado</label>
               <select class="status-select ${issue.status}" onchange="updateIssueStatus('${issue.id}',this)">
                 ${statusOptions(issue.status)}
+              </select>
+            </div>
+            <div class="field" style="flex:0 0 140px">
+              <label>Prioridad</label>
+              <select class="priority-select ${prio}" onchange="updateIssuePriority('${issue.id}',this)">
+                ${priorityOptions(prio)}
               </select>
             </div>
           </div>
@@ -956,7 +1135,7 @@
           </div>
         </div>
       </div>
-    `).join('');
+    `}).join('');
 
     renderHeader();
   }
@@ -992,6 +1171,21 @@
     }
     save();
     renderHeader();
+  }
+
+  function updateIssuePriority(id, sel) {
+    const issues = db.issues[db.active];
+    const issue  = issues?.find(i => i.id === id);
+    if (!issue) return;
+    issue.priority = sel.value;
+    sel.className = `priority-select ${sel.value}`;
+    const badge = document.querySelector(`#iss-${id} .issue-header .priority-badge`);
+    if (badge) {
+      badge.className = `priority-badge ${sel.value}`;
+      badge.textContent = PRIORITIES[sel.value].label;
+    }
+    save();
+    renderPriorityPanel(activeIssues());
   }
 
   function deleteIssue(e, id) {
@@ -1066,9 +1260,10 @@
 
   // ── Issue modal ──────────────────────────────────────────────────────────
   function openIssueModal() {
-    document.getElementById('newTitle').value  = '';
-    document.getElementById('newStatus').value = 'abierto';
-    document.getElementById('newNotes').value  = '';
+    document.getElementById('newTitle').value    = '';
+    document.getElementById('newStatus').value   = 'abierto';
+    document.getElementById('newPriority').value = 'media';
+    document.getElementById('newNotes').value    = '';
     document.getElementById('modalIssue').classList.add('open');
     setTimeout(() => document.getElementById('newTitle').focus(), 80);
   }
@@ -1082,12 +1277,13 @@
 
     const num = proj.nextIssue++;
     db.issues[db.active].unshift({
-      id:      uid(),
+      id:       uid(),
       num,
       title,
-      status:  document.getElementById('newStatus').value,
-      notes:   document.getElementById('newNotes').value.trim(),
-      created: Date.now(),
+      status:   document.getElementById('newStatus').value,
+      priority: document.getElementById('newPriority').value,
+      notes:    document.getElementById('newNotes').value.trim(),
+      created:  Date.now(),
     });
     save();
     closeModal('modalIssue');
@@ -1141,9 +1337,13 @@
   document.getElementById('newTitle').addEventListener('keydown', e => { if (e.key === 'Enter') createIssue(); });
 
   // ── Init ─────────────────────────────────────────────────────────────────
-  renderSidebar();
-  renderHeader();
-  renderMain();
+  fetch('/api/db')
+    .then(r => r.json())
+    .then(data => {
+      if (data && Array.isArray(data.projects)) db = data;
+      renderSidebar(); renderHeader(); renderMain();
+    })
+    .catch(() => { renderSidebar(); renderHeader(); renderMain(); });
 </script>
 </body>
 </html>
