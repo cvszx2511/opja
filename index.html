@@ -26,6 +26,10 @@
       --rechazado-bg:  #2a0f0f;
       --aprobado:      #58a6ff;
       --aprobado-bg:   #0f1f3d;
+      --prueba:        #f0883e;
+      --prueba-bg:     #2a1800;
+      --produccion:    #e05c00;
+      --produccion-bg: #1f0f00;
 
       --critica:       #f85149;
       --critica-bg:    #2a0f0f;
@@ -103,10 +107,12 @@
       font-weight: 600;
     }
 
-    .stat-pill.abierto   { color: var(--abierto);   background: var(--abierto-bg); }
-    .stat-pill.proceso   { color: var(--proceso);   background: var(--proceso-bg); }
-    .stat-pill.rechazado { color: var(--rechazado); background: var(--rechazado-bg); }
-    .stat-pill.aprobado  { color: var(--aprobado);  background: var(--aprobado-bg); }
+    .stat-pill.abierto    { color: var(--abierto);    background: var(--abierto-bg); }
+    .stat-pill.proceso    { color: var(--proceso);    background: var(--proceso-bg); }
+    .stat-pill.rechazado  { color: var(--rechazado);  background: var(--rechazado-bg); }
+    .stat-pill.aprobado   { color: var(--aprobado);   background: var(--aprobado-bg); }
+    .stat-pill.prueba     { color: var(--prueba);     background: var(--prueba-bg); }
+    .stat-pill.produccion { color: var(--produccion); background: var(--produccion-bg); }
 
     /* ── Layout ── */
     .app-body {
@@ -393,10 +399,12 @@
       flex-shrink: 0;
     }
 
-    .status-badge.abierto   { color: var(--abierto);   background: var(--abierto-bg);   border: 1px solid var(--abierto); }
-    .status-badge.proceso   { color: var(--proceso);   background: var(--proceso-bg);   border: 1px solid var(--proceso); }
-    .status-badge.rechazado { color: var(--rechazado); background: var(--rechazado-bg); border: 1px solid var(--rechazado); }
-    .status-badge.aprobado  { color: var(--aprobado);  background: var(--aprobado-bg);  border: 1px solid var(--aprobado); }
+    .status-badge.abierto    { color: var(--abierto);    background: var(--abierto-bg);    border: 1px solid var(--abierto); }
+    .status-badge.proceso    { color: var(--proceso);    background: var(--proceso-bg);    border: 1px solid var(--proceso); }
+    .status-badge.rechazado  { color: var(--rechazado);  background: var(--rechazado-bg);  border: 1px solid var(--rechazado); }
+    .status-badge.aprobado   { color: var(--aprobado);   background: var(--aprobado-bg);   border: 1px solid var(--aprobado); }
+    .status-badge.prueba     { color: var(--prueba);     background: var(--prueba-bg);     border: 1px solid var(--prueba); }
+    .status-badge.produccion { color: var(--produccion); background: var(--produccion-bg); border: 1px solid var(--produccion); }
 
     .chevron {
       color: var(--text-muted);
@@ -481,10 +489,12 @@
     }
 
     select.status-select:focus { border-color: var(--accent); }
-    select.status-select.abierto   { color: var(--abierto); }
-    select.status-select.proceso   { color: var(--proceso); }
-    select.status-select.rechazado { color: var(--rechazado); }
-    select.status-select.aprobado  { color: var(--aprobado); }
+    select.status-select.abierto    { color: var(--abierto); }
+    select.status-select.proceso    { color: var(--proceso); }
+    select.status-select.rechazado  { color: var(--rechazado); }
+    select.status-select.aprobado   { color: var(--aprobado); }
+    select.status-select.prueba     { color: var(--prueba); }
+    select.status-select.produccion { color: var(--produccion); }
 
     textarea.notes-area {
       width: 100%;
@@ -841,6 +851,8 @@
           <option value="proceso">En proceso</option>
           <option value="rechazado">Rechazado</option>
           <option value="aprobado">Aprobado</option>
+          <option value="prueba">Lanzado en prueba</option>
+          <option value="produccion">Lanzado en producción</option>
         </select>
       </div>
       <div class="field" style="flex:1">
@@ -867,10 +879,12 @@
 <script>
   // ── State ───────────────────────────────────────────────────────────────
   const STATUSES = {
-    abierto:   { label: 'Abierto' },
-    proceso:   { label: 'En proceso' },
-    rechazado: { label: 'Rechazado' },
-    aprobado:  { label: 'Aprobado' },
+    abierto:    { label: 'Abierto' },
+    proceso:    { label: 'En proceso' },
+    rechazado:  { label: 'Rechazado' },
+    aprobado:   { label: 'Aprobado' },
+    prueba:     { label: 'Lanzado en prueba' },
+    produccion: { label: 'Lanzado en producción' },
   };
 
   const PRIORITIES = {
@@ -972,7 +986,7 @@
     `;
 
     const issues = activeIssues();
-    const counts = { abierto: 0, proceso: 0, rechazado: 0, aprobado: 0 };
+    const counts = { abierto: 0, proceso: 0, rechazado: 0, aprobado: 0, prueba: 0, produccion: 0 };
     issues.forEach(i => counts[i.status]++);
     hs.innerHTML = Object.entries(counts)
       .filter(([,v]) => v > 0)
@@ -1010,6 +1024,8 @@
           <option value="proceso">En proceso</option>
           <option value="rechazado">Rechazado</option>
           <option value="aprobado">Aprobado</option>
+          <option value="prueba">Lanzado en prueba</option>
+          <option value="produccion">Lanzado en producción</option>
         </select>
         <select class="filter-select" id="filterPriority">
           <option value="">Todas las prioridades</option>
