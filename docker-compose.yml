@@ -1,0 +1,14 @@
+services:
+  opja:
+    build: .
+    container_name: opja
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
+    volumes:
+      - ./data:/app/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 32M
