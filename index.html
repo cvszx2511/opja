@@ -31,6 +31,15 @@
       --produccion:    #e05c00;
       --produccion-bg: #1f0f00;
 
+      --bug:           #f85149;
+      --bug-bg:        #2a0f0f;
+      --feature:       #a371f7;
+      --feature-bg:    #1a0f2e;
+      --mejora:        #39c5cf;
+      --mejora-bg:     #0f2020;
+      --tecnica:       #8b949e;
+      --tecnica-bg:    #21262d;
+
       --critica:       #f85149;
       --critica-bg:    #2a0f0f;
       --alta:          #f0883e;
@@ -661,6 +670,57 @@
       line-height: 1.4;
     }
 
+    /* ── Tipo badge ── */
+    .tipo-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tipo-badge.bug      { color: var(--bug);     background: var(--bug-bg);     border: 1px solid var(--bug); }
+    .tipo-badge.feature  { color: var(--feature);  background: var(--feature-bg);  border: 1px solid var(--feature); }
+    .tipo-badge.mejora   { color: var(--mejora);   background: var(--mejora-bg);   border: 1px solid var(--mejora); }
+    .tipo-badge.tecnica  { color: var(--tecnica);  background: var(--tecnica-bg);  border: 1px solid var(--tecnica); }
+
+    select.tipo-select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 32px 8px 11px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color .15s;
+    }
+
+    select.tipo-select:focus   { border-color: var(--accent); }
+    select.tipo-select.bug     { color: var(--bug); }
+    select.tipo-select.feature { color: var(--feature); }
+    select.tipo-select.mejora  { color: var(--mejora); }
+    select.tipo-select.tecnica { color: var(--tecnica); }
+
+    .seccion-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 7px;
+      margin-left: 6px;
+      font-weight: 500;
+    }
+
     /* ── Priority panel ── */
     .priority-panel {
       display: grid;
@@ -837,12 +897,47 @@
 
 <!-- ── Modal: nueva tarea ── -->
 <div class="modal-overlay" id="modalIssue">
-  <div class="modal">
+  <div class="modal" style="max-width:560px">
     <h2>Nueva tarea</h2>
+
     <div class="field">
       <label>Título</label>
-      <input type="text" class="modal-input" id="newTitle" placeholder="Describe la tarea…" maxlength="120">
+      <input type="text" class="modal-input" id="newTitle" placeholder="Describe brevemente la tarea…" maxlength="120">
     </div>
+
+    <div style="display:flex;gap:12px">
+      <div class="field" style="flex:1">
+        <label>Tipo</label>
+        <select class="modal-select" id="newTipo">
+          <option value="bug">🐛 Bug</option>
+          <option value="feature">✨ Nueva funcionalidad</option>
+          <option value="mejora">🔧 Mejora</option>
+          <option value="tecnica">⚙️ Tarea técnica</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1">
+        <label>Sección afectada</label>
+        <select class="modal-select" id="newSeccion">
+          <option value="general">General</option>
+          <optgroup label="Frontend">
+            <option value="login">Login</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="venta">Venta / Nueva orden</option>
+            <option value="menu">Menú</option>
+            <option value="carrito">Carrito</option>
+            <option value="ordenes">Órdenes</option>
+            <option value="pedido">Detalle de Pedido</option>
+            <option value="productos">Config. Productos</option>
+          </optgroup>
+          <optgroup label="Backend">
+            <option value="api">Backend / API REST</option>
+            <option value="auth">Autenticación / JWT</option>
+            <option value="db">Base de datos</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
     <div style="display:flex;gap:12px">
       <div class="field" style="flex:1">
         <label>Estado inicial</label>
@@ -865,10 +960,12 @@
         </select>
       </div>
     </div>
+
     <div class="field">
-      <label>Notas (opcional)</label>
-      <textarea class="modal-textarea" id="newNotes" placeholder="Información adicional…" rows="3"></textarea>
+      <label>Descripción / Contexto para IA</label>
+      <textarea class="modal-textarea" id="newNotes" placeholder="Describe el problema o la funcionalidad con suficiente contexto para que una IA pueda ayudarte. Incluye comportamiento esperado, comportamiento actual, pasos para reproducir si es un bug, etc." rows="4"></textarea>
     </div>
+
     <div class="modal-actions">
       <button class="btn-cancel" id="btnCancelIssue">Cancelar</button>
       <button class="btn-primary" id="btnCreateIssue">Crear tarea</button>
@@ -892,6 +989,28 @@
     alta:    { label: 'Alta' },
     media:   { label: 'Media' },
     baja:    { label: 'Baja' },
+  };
+
+  const TIPOS = {
+    bug:     { label: 'Bug',                icon: '🐛' },
+    feature: { label: 'Nueva funcionalidad', icon: '✨' },
+    mejora:  { label: 'Mejora',             icon: '🔧' },
+    tecnica: { label: 'Tarea técnica',       icon: '⚙️' },
+  };
+
+  const SECCIONES = {
+    general:   'General',
+    login:     'Login',
+    dashboard: 'Dashboard',
+    venta:     'Venta / Nueva orden',
+    menu:      'Menú',
+    carrito:   'Carrito',
+    ordenes:   'Órdenes',
+    pedido:    'Detalle de Pedido',
+    productos: 'Config. Productos',
+    api:       'Backend / API',
+    auth:      'Autenticación / JWT',
+    db:        'Base de datos',
   };
 
   let db = { projects: [], issues: {}, active: null };
@@ -946,6 +1065,20 @@
     return Object.entries(PRIORITIES).map(([k, v]) =>
       `<option value="${k}" ${k === current ? 'selected' : ''}>${v.label}</option>`
     ).join('');
+  }
+
+  function tipoOptions(current) {
+    return Object.entries(TIPOS).map(([k, v]) =>
+      `<option value="${k}" ${k === current ? 'selected' : ''}>${v.icon} ${v.label}</option>`
+    ).join('');
+  }
+
+  function seccionOptions(current) {
+    const fe = ['login','dashboard','venta','menu','carrito','ordenes','pedido','productos'];
+    const be = ['api','auth','db'];
+    return `<option value="general" ${current==='general'?'selected':''}>General</option>
+      <optgroup label="Frontend">${fe.map(k=>`<option value="${k}" ${k===current?'selected':''}>${SECCIONES[k]}</option>`).join('')}</optgroup>
+      <optgroup label="Backend">${be.map(k=>`<option value="${k}" ${k===current?'selected':''}>${SECCIONES[k]}</option>`).join('')}</optgroup>`;
   }
 
   // ── Sidebar ──────────────────────────────────────────────────────────────
@@ -1027,6 +1160,32 @@
           <option value="prueba">Lanzado en prueba</option>
           <option value="produccion">Lanzado en producción</option>
         </select>
+        <select class="filter-select" id="filterTipo">
+          <option value="">Todos los tipos</option>
+          <option value="bug">🐛 Bug</option>
+          <option value="feature">✨ Funcionalidad</option>
+          <option value="mejora">🔧 Mejora</option>
+          <option value="tecnica">⚙️ Técnica</option>
+        </select>
+        <select class="filter-select" id="filterSeccion">
+          <option value="">Todas las secciones</option>
+          <option value="general">General</option>
+          <optgroup label="Frontend">
+            <option value="login">Login</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="venta">Venta</option>
+            <option value="menu">Menú</option>
+            <option value="carrito">Carrito</option>
+            <option value="ordenes">Órdenes</option>
+            <option value="pedido">Detalle Pedido</option>
+            <option value="productos">Config. Productos</option>
+          </optgroup>
+          <optgroup label="Backend">
+            <option value="api">Backend / API</option>
+            <option value="auth">Autenticación</option>
+            <option value="db">Base de datos</option>
+          </optgroup>
+        </select>
         <select class="filter-select" id="filterPriority">
           <option value="">Todas las prioridades</option>
           <option value="critica">Crítica</option>
@@ -1047,6 +1206,8 @@
     document.getElementById('btnNewIssue').addEventListener('click', openIssueModal);
     document.getElementById('searchInput').addEventListener('input', renderIssues);
     document.getElementById('filterStatus').addEventListener('change', renderIssues);
+    document.getElementById('filterTipo').addEventListener('change', renderIssues);
+    document.getElementById('filterSeccion').addEventListener('change', renderIssues);
     document.getElementById('filterPriority').addEventListener('change', renderIssues);
 
     renderIssues();
@@ -1079,6 +1240,8 @@
     const q       = (document.getElementById('searchInput')?.value || '').toLowerCase();
     const filterS = document.getElementById('filterStatus')?.value || '';
     const filterP = document.getElementById('filterPriority')?.value || '';
+    const filterT = document.getElementById('filterTipo')?.value || '';
+    const filterSec = document.getElementById('filterSeccion')?.value || '';
     const proj    = activeProject();
     const list    = document.getElementById('issueList');
     if (!proj || !list) return;
@@ -1087,10 +1250,12 @@
     renderPriorityPanel(all);
 
     const filtered = all.filter(i => {
-      const mq = !q || i.title.toLowerCase().includes(q) || (i.notes || '').toLowerCase().includes(q);
-      const ms = !filterS || i.status === filterS;
-      const mp = !filterP || (i.priority || 'media') === filterP;
-      return mq && ms && mp;
+      const mq   = !q || i.title.toLowerCase().includes(q) || (i.notes || '').toLowerCase().includes(q);
+      const ms   = !filterS   || i.status === filterS;
+      const mp   = !filterP   || (i.priority || 'media') === filterP;
+      const mt   = !filterT   || (i.tipo || 'tecnica') === filterT;
+      const msec = !filterSec || (i.seccion || 'general') === filterSec;
+      return mq && ms && mp && mt && msec;
     });
 
     if (filtered.length === 0) {
@@ -1105,14 +1270,20 @@
 
     list.innerHTML = filtered.map(issue => {
       const prio = issue.priority || 'media';
+      const tipo = issue.tipo     || 'tecnica';
+      const sec  = issue.seccion  || 'general';
       return `
       <div class="issue" id="iss-${issue.id}" data-id="${issue.id}">
         <div class="issue-header" onclick="toggleIssue('${issue.id}')">
           <span class="issue-id">${escHtml(proj.key)}-${String(issue.num).padStart(3, '0')}</span>
           <div class="issue-title-wrap">
             <div class="issue-title">${escHtml(issue.title)}</div>
-            <div class="issue-meta">Creado ${formatDate(issue.created)}</div>
+            <div class="issue-meta">
+              Creado ${formatDate(issue.created)}
+              ${sec !== 'general' ? `<span class="seccion-tag">${escHtml(SECCIONES[sec] || sec)}</span>` : ''}
+            </div>
           </div>
+          <span class="tipo-badge ${tipo}">${TIPOS[tipo]?.icon} ${TIPOS[tipo]?.label}</span>
           <span class="priority-badge ${prio}">${PRIORITIES[prio].label}</span>
           <span class="status-badge ${issue.status}">${STATUSES[issue.status].label}</span>
           <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1126,18 +1297,32 @@
         </div>
         <div class="issue-body">
           <div class="field-row">
-            <div class="field">
+            <div class="field" style="flex:2">
               <label>Título</label>
               <input type="text" class="title-input" value="${escHtml(issue.title)}"
                 onchange="updateIssueField('${issue.id}','title',this.value)">
             </div>
+            <div class="field" style="flex:0 0 130px">
+              <label>Tipo</label>
+              <select class="tipo-select ${tipo}" onchange="updateIssueTipo('${issue.id}',this)">
+                ${tipoOptions(tipo)}
+              </select>
+            </div>
+            <div class="field" style="flex:0 0 170px">
+              <label>Sección</label>
+              <select class="modal-select" onchange="updateIssueField('${issue.id}','seccion',this.value)">
+                ${seccionOptions(sec)}
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
             <div class="field" style="flex:0 0 150px">
               <label>Estado</label>
               <select class="status-select ${issue.status}" onchange="updateIssueStatus('${issue.id}',this)">
                 ${statusOptions(issue.status)}
               </select>
             </div>
-            <div class="field" style="flex:0 0 140px">
+            <div class="field" style="flex:0 0 130px">
               <label>Prioridad</label>
               <select class="priority-select ${prio}" onchange="updateIssuePriority('${issue.id}',this)">
                 ${priorityOptions(prio)}
@@ -1145,8 +1330,8 @@
             </div>
           </div>
           <div class="field">
-            <label>Notas</label>
-            <textarea class="notes-area" placeholder="Añade notas, comentarios o detalles…"
+            <label>Descripción / Contexto para IA</label>
+            <textarea class="notes-area" placeholder="Describe el problema, comportamiento esperado, pasos para reproducir…"
               onchange="updateIssueField('${issue.id}','notes',this.value)">${escHtml(issue.notes || '')}</textarea>
           </div>
         </div>
@@ -1187,6 +1372,20 @@
     }
     save();
     renderHeader();
+  }
+
+  function updateIssueTipo(id, sel) {
+    const issues = db.issues[db.active];
+    const issue  = issues?.find(i => i.id === id);
+    if (!issue) return;
+    issue.tipo = sel.value;
+    sel.className = `tipo-select ${sel.value}`;
+    const badge = document.querySelector(`#iss-${id} .issue-header .tipo-badge`);
+    if (badge) {
+      badge.className = `tipo-badge ${sel.value}`;
+      badge.innerHTML = `${TIPOS[sel.value].icon} ${TIPOS[sel.value].label}`;
+    }
+    save();
   }
 
   function updateIssuePriority(id, sel) {
@@ -1277,6 +1476,8 @@
   // ── Issue modal ──────────────────────────────────────────────────────────
   function openIssueModal() {
     document.getElementById('newTitle').value    = '';
+    document.getElementById('newTipo').value     = 'feature';
+    document.getElementById('newSeccion').value  = 'general';
     document.getElementById('newStatus').value   = 'abierto';
     document.getElementById('newPriority').value = 'media';
     document.getElementById('newNotes').value    = '';
@@ -1296,6 +1497,8 @@
       id:       uid(),
       num,
       title,
+      tipo:     document.getElementById('newTipo').value,
+      seccion:  document.getElementById('newSeccion').value,
       status:   document.getElementById('newStatus').value,
       priority: document.getElementById('newPriority').value,
       notes:    document.getElementById('newNotes').value.trim(),
