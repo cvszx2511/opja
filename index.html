@@ -438,7 +438,8 @@
       transition: color .15s, border-color .15s, background .15s;
     }
 
-    .btn-delete:hover { color: var(--rechazado); border-color: var(--rechazado); background: var(--rechazado-bg); }
+    .btn-delete:hover    { color: var(--rechazado); border-color: var(--rechazado); background: var(--rechazado-bg); }
+    .btn-download:hover  { color: var(--aprobado);  border-color: var(--aprobado);  background: var(--aprobado-bg); }
 
     /* ── Issue body ── */
     .issue-body {
@@ -1289,6 +1290,11 @@
           <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6"/>
           </svg>
+          <button class="btn-delete btn-download" onclick="downloadIssue(event,'${issue.id}')" title="Descargar como texto plano">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </button>
           <button class="btn-delete" onclick="deleteIssue(event,'${issue.id}')" title="Eliminar tarea">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 6h18M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/>
@@ -1401,6 +1407,51 @@
     }
     save();
     renderPriorityPanel(activeIssues());
+  }
+
+  function downloadIssue(e, id) {
+    e.stopPropagation();
+    const proj  = activeProject();
+    const issue = activeIssues().find(i => i.id === id);
+    if (!issue || !proj) return;
+
+    const key    = `${proj.key}-${String(issue.num).padStart(3, '0')}`;
+    const tipo   = TIPOS[issue.tipo || 'tecnica'];
+    const prio   = PRIORITIES[issue.priority || 'media'];
+    const status = STATUSES[issue.status];
+    const sec    = SECCIONES[issue.seccion || 'general'] || 'General';
+
+    const lines = [
+      `TAREA: ${key}`,
+      `Proyecto: ${proj.name} (${proj.key})`,
+      `Fecha: ${formatDate(issue.created)}`,
+      ``,
+      `Tipo:     ${tipo.icon} ${tipo.label}`,
+      `Sección:  ${sec}`,
+      `Estado:   ${status.label}`,
+      `Prioridad: ${prio.label}`,
+      ``,
+      `Título:`,
+      issue.title,
+      ``,
+    ];
+
+    if (issue.notes?.trim()) {
+      lines.push(`Descripción / Contexto:`);
+      lines.push(issue.notes.trim());
+      lines.push(``);
+    }
+
+    lines.push(`---`);
+    lines.push(`Generado por opja · ${new Date().toLocaleString('es-ES')}`);
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `${key.toLowerCase()}-${issue.title.slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function deleteIssue(e, id) {
